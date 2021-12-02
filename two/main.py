@@ -19,13 +19,14 @@ class SubmarinePilot(object):
         self.xy += basis * magnitude
         self.xy[np.where(self.xy < 0)] = 0
 
-
     def __call__(self):
         return self.xy[0] * self.xy[1]
 
+
 class AimedPilot(SubmarinePilot):
+
     def __init__(self):
-        self.xy = np.array([0, 0,0])
+        self.xy = np.array([0, 0, 0])
         self.mapping = {
             "forward": 0,
             "down": 1,
@@ -41,7 +42,6 @@ class AimedPilot(SubmarinePilot):
             self.xy[0] += magnitude
             self.xy[1] += magnitude * self.xy[-1]
         self.xy[1] = max(self.xy[1], 0)
-
 
 
 def runner(p: SubmarinePilot, instructions: List[str]) -> int:
@@ -69,5 +69,3 @@ if __name__ == "__main__":
     print("Running submarine")
     pilot = AimedPilot()
     print(runner(pilot, instructions))
-
-

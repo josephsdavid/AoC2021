@@ -3,6 +3,7 @@ import numpy as np
 
 
 class SonarSweep(object):
+
     def __init__(self, report: List[int]):
         self.report = np.array(report)
         self.change = self.find_change_in_depth(self.report)
@@ -17,7 +18,9 @@ class SonarSweep(object):
     def __call__(self):
         return int(np.clip(self.change_sign, 0., 1.).sum())
 
+
 class SlidingSonarSweep(SonarSweep):
+
     def __init__(self, report: List[int], winsize: int = 3):
         self.winsize = winsize
         self.report = np.lib.stride_tricks.sliding_window_view(report, self.winsize).sum(1)
