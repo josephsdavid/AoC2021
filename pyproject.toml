@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "aoc2015"
+version = "0.1.0"
+description = ""
+authors = ["david josephs"]
+
+[tool.poetry.dependencies]
+python = ">=3.7.6, <3.10"
+numpy = "^1.20.2"
+scipy = "^1.6.3"
+
+[tool.poetry.dev-dependencies]
+yapf = "^0.31.0"
+wheel = "^0.37.0"
+rich = "^10.12.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
