@@ -1,7 +1,6 @@
 import numpy as np
 import itertools as it
-import ast
-from typing import List, Tuple
+from typing import Tuple
 from rich import print
 
 class VentFinder(object):
@@ -9,7 +8,7 @@ class VentFinder(object):
     def __init__(self, coords: str):
         split = coords.splitlines()
         split = [s for s in split if len(s) > 0]
-        self.coords = [[ast.literal_eval(y) for y in z.split(' -> ')] for z in split]
+        self.coords = [[eval(y) for y in z.split(' -> ')] for z in split]
         max_val = max(list(it.chain(*(it.chain(*self.coords)))))
         self.grid = np.zeros((max_val+1, max_val+1))
         self.find_linear_vents()
@@ -66,7 +65,6 @@ if __name__ == "__main__":
 3,4 -> 1,4
 0,0 -> 8,8
 5,5 -> 8,2
-9,5 -> 4,0
 """
 
     print(VentFinder(test)())
