@@ -39,9 +39,10 @@ def crab_shifter_v2(init: List[int]) -> Tuple[int, int]:
     y = np.row_stack([base for _ in range(x.shape[0])])
     fuel_array = (x - y.T)
     fuel_array = np.abs(fuel_array)
+    fuel_dict = {k: np.arange(k+1).sum() for k in set(fuel_array.flatten())}
     for i in range(fuel_array.shape[0]):
         for j in range(fuel_array.shape[1]):
-            fuel_array[i,j] = np.arange(fuel_array[i,j] + 1).sum()
+            fuel_array[i,j] = fuel_dict[fuel_array[i,j]]
     fuel_costs = fuel_array.sum(1)
     return fuel_costs.argmin(), fuel_costs.min()
 
