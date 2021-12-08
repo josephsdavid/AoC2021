@@ -46,5 +46,7 @@ def crab_shifter_v2(init: List[int]) -> Tuple[int, int]:
     fuel_costs = fuel_array.sum(1)
     return fuel_costs.argmin(), fuel_costs.min()
 
-crab_shifter_v2(test_case)
-crab_shifter_v2(crabs)
+from data import crabs
+
+print(crab_shifter_v2(test_case))
+print(crab_shifter_v2(crabs))
