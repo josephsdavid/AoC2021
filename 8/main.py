@@ -6,66 +6,135 @@ import itertools as it
 
 pretty.install()
 
+base_dict = {
+        0: 'abcefg',
+        1: 'cf',
+        2: 'acdeg',
+        3: 'acdfg',
+        4: 'bcdf',
+        5: 'abdfg',
+        6: 'abdefg',
+        7: 'acf',
+        8: 'abcdefg',
+        9: 'abcdfg'}
 
-def ssorted(s):
-    return "".join(sorted(s))
+class WireMapper(object):
+    def __init__(self):
+        base_dict = {
+                0: 'abcefg',
+                1: 'cf',
+                2: 'acdeg',
+                3: 'acdfg',
+                4: 'bcdf',
+                5: 'abdfg',
+                6: 'abdefg',
+                7: 'acf',
+                8: 'abcdefg',
+                9: 'abcdfg'}
+        len_dict = {k: {"v": v, "len": len(v)} for k, v in base_dict.items()}
+        len_counts = Counter([v["len"] for v in len_dict.values()])
+        self.len_dict = len_dict
+        self.len_counts = len_counts
 
+    def reverse_len_dict(self):
+        out = {}
+        for k, v in self.len_dict.items():
+            out.setdefault(v['len'], []).append(k)
+        return out
 
-def p1_runner(signal: str) -> int:
-    known_digits = {
-        2: 1,
-        3: 7,
-        4: 4,
-        7: 8
-    }
-    out = 0
-    for row in signal.splitlines():
-        rhs = row.split(' | ')[-1]
-        lhs = row.split(' | ')[0]
-        mapping = {
-            ssorted(s): known_digits[len(s)] for s in lhs.split() if len(s) in known_digits.keys()
-        }
-        for s in rhs.split():
-            if ssorted(s) in mapping.keys():
-                out += 1
+    def reverse_mapping(self):
+        return {v: k for k, v in self.mapping.items()}
 
+    def fit(self, wire: str):
+        mapping = {}
+        for w in wire.split():
+            if self.len_counts[len(w)] == 1:
+                mapping["".join(sorted(list(w)))] = self.reverse_len_dict()[len(w)][0]
+        self.mapping = mapping
 
-    return out
-
-
-def p2_runner(signal: str) -> int:
-    out = 0
-    known_digits = {
-        2: 1,
-        3: 7,
-        4: 4,
-        7: 8
-    }
-    for row in signal.splitlines():
-        id_d = {}
-        rhs = row.split(' | ')[-1]
-        lhs = row.split(' | ')[0]
-        mapping = {known_digits[len(s)]: list(s) for s in lhs.split() if len(s) in known_digits.keys()}
-        number_d = {k:("".join(sorted(v))) for k, v in mapping.items()}
-        id_d[0] = [x for x in mapping[7] if x not in mapping[1]][0]
-        four_count = [[z for z in mapping[4] if z not in xx] for xx in lhs.split() ]
-        id_d[3] = [k for k, v in Counter(it.chain(*four_count)).items() if v == 3][0]
-        unknown = [x for x in lhs.split() if len(x) not in known_digits.keys()]
-        missing_one = [x for x in unknown if len(x) == 6]
-        number_d[0] = [ssorted(x) for x in missing_one if id_d[3] not in x][0]
-        number_d[6] = [ssorted(x) for x in missing_one if len([z for z in number_d[1] if z in x]) == 1][0]
-        number_d[9] = [ssorted(x) for x in missing_one if ssorted(x) not in [number_d[6], number_d[0]]][0]
-        unknown = [x for x in lhs.split() if ssorted(x) not in number_d.values()]
-        number_d[3] = [ssorted(x) for x in unknown if len([z for z in number_d[4] if z in x]) == 2][0]
-        id_d[4] = [x for x in number_d[6] if x not in number_d[9]][0]
-        unknown = [x for x in lhs.split() if ssorted(x) not in number_d.values()]
-        number_d[5] = [ssorted(x) for x in unknown if id_d[4] not in x][0]
-        number_d[2] = [ssorted(x) for x in lhs.split() if ssorted(x) not in number_d.values()][0]
-        number_map = {v: k for k,v in number_d.items()}
-        num = int("".join([str(number_map[ssorted(x)]) for x in rhs.split()]))
-        print(num)
-        out += num
-    return out
+    def predict(self, wire: str) -> str:
+        out = ''
+        for w in wire.split():
+            sw = "".join(sorted(list(w)))
+            if sw in self.mapping.keys():
+                out += str(self.mapping[sw])
+        return out
 
 
-print(p2_runner(test_case))
+    def fit_predict(self, wire: str) -> str:
+        splitwire = wire.split(' | ')
+        self.fit(splitwire[0])
+        return self.predict(splitwire[1])
+
+class CrazyWireMapper(WireMapper):
+    def __init__(self):
+        super().__init__()
+
+
+    def fit(self, wire: str):
+        super().fit(wire)
+        most_common = self.len_counts.most_common()
+        most_common = list(filter(lambda x: x[-1] != 1, most_common))
+        most_common = sorted(most_common, key = lambda x: x[0])
+        len_dict = {k[0]:[] for k in most_common}
+        for w in wire.split():
+            lw = len(w)
+            if lw in len_dict.keys(): len_dict[lw].append(w)
+        self.fit_six(len_dict)
+        self.fit_five(len_dict)
+
+
+    def fit_five(self, len_dict: dict):
+        wire = len_dict[5]
+        diff7 = [self.check_setdiff(x,7) for x in wire]
+        self.mapping["".join(sorted(list(wire.pop(diff7.index(min(diff7))))))] = 3
+        diff9 = [self.check_setdiff(x,9) for x in wire]
+        self.mapping["".join(sorted(list(wire.pop(diff9.index(min(diff9))))))] = 5
+        self.mapping["".join(sorted(list(wire.pop(0))))] = 2
+
+
+
+    def fit_six(self, len_dict: dict):
+        wire = len_dict[6]
+        # 0 and 9 share a wall with 1, 6 does not
+        diff1 = [self.check_setdiff(x,1) for x in wire]
+        self.mapping["".join(sorted(list(wire.pop(diff1.index(max(diff1))))))] = 6
+        # zero shares less walls with 4 than 9
+        diff4 = [self.check_setdiff(x,4) for x in wire]
+        self.mapping["".join(sorted(list(wire.pop(diff4.index(max(diff4))))))] = 0
+        # 9 is all thats left
+        self.mapping["".join(sorted(list(wire.pop(0))))] = 9
+
+    def check_setdiff(self,x: str, key: int):
+        setdiff = set(x) - set(self.reverse_mapping()[key])
+        return len(setdiff)
+
+
+
+class WireRunner(object):
+    def __init__(self, wires: str, cls):
+        self.wires = wires.splitlines()
+        self.results = []
+        for w in self.wires:
+            self.results.append(cls().fit_predict(w))
+    def __call__(self):
+        return self.results
+
+def p1_runner(wires: str):
+    test = WireRunner(wires, WireMapper)()
+    print(test)
+    ret = sum([len(x) for x in test])
+    print(ret)
+    return ret
+def p2_runner(wires: str):
+    test = WireRunner(wires, CrazyWireMapper)()
+    print(sum(map(int, test)))
+
+
+print("Starting Problem 1!")
+#p1_runner(test_case)
+#p1_runner(real_deal)
+
+print("starting 2")
+p2_runner(test_case)
+p2_runner(real_deal)
