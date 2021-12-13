@@ -63,6 +63,7 @@ def find_flashes(a: np.ndarray, ret = []):
         prod = [p for p in prod if p[0] >= 0 and p[1] >= 0]
         prod = [p for p in prod if p[0] < a.shape[0] and p[1] < a.shape[1]]
         for p in prod:
+            # if a[p] is 0, it has already been seen, and we dont need to grow it
             if a[p] != 0:
                 a[p] += 1
     next_idxs = np.where(a > 9)
@@ -83,7 +84,8 @@ def run_p2(xx, i = 1, ret = []):
         return run_p2(xx, i+1, ret)
 
 real_deal = load_data(real_deal)
-_, llist = (run_p2(real_deal))
+idx, llist = (run_p2(real_deal))
+print(idx)
 
 data = [9 - x for x in llist]
 
