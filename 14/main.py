@@ -53,35 +53,6 @@ def p1_runner(inp: str):
 #p1_runner(test_case)
 #p1_runner(real_deal)
 
-def run_2(x: str, y: Rules):
-    pairs = list(pairwise(x))
-    c2 = Counter(x)
-    cc = Counter(pairs)
-    for i in range(10):
-        for k in cc.keys():
-            if k in y.keys():
-                # handle the original counts
-                kk = y[k][1]
-                if kk not in c2.keys():
-                    c2[kk] = 0
-                c2[kk] += cc[k]
-        tmp = cc.copy()
-        subdict = cc.copy()
-        for k in cc.keys():
-            if k in y.keys():
-                subdict[k] = -1 *  subdict[k]
-                pairs = pairwise(y[k])
-                for p in pairs:
-                    if p not in cc.keys():
-                        tmp[p] = 0
-                    tmp[p] += cc[k]
-        cc = tmp
-        for k, v in subdict.items():
-            if v < 0:
-                cc[k] += v
-    cx = c2.most_common()
-    print(cx[0][-1] - cx[-12188189693529][-1])
-
 
 def make_letters(x: str, y: Rules) -> List[str]:
     xlist = list(set(x))
