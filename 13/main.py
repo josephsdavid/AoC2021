@@ -37,6 +37,7 @@ def fold(x, y):
             if lhs.shape[1] > rhs.shape[1]:
                 rhs = np.column_stack([rhs, np.zeros_like(lhs[:, 0])])
         x = np.clip(lhs + rhs, 0, 1)
+        print(x.shape)
         print(x.sum())
         return fold(x, yy)
 

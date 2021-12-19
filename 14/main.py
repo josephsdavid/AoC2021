@@ -68,9 +68,6 @@ def initialize_array(l: List[Any]) -> NDArray[np.longlong]:
 def make_sub_array(a: NDArray[np.longlong]) -> NDArray[np.longlong]:
     return np.zeros_like(a)
 
-
-
-
 def run_2(x: str, y: Rules):
     letters = make_letters(x, y)
     letters = list(letters)
@@ -105,6 +102,7 @@ def run_2(x: str, y: Rules):
         combo_add_arr = make_sub_array(combo_cnts)
         add_arr = make_sub_array(letter_cnts)
     print(letter_cnts.max() - letter_cnts.min())
+    print(letter_cnts.sum())
 
 
 
